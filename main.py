@@ -7,15 +7,12 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 import requests
 import json
-from google import genai
 
-openrouter_api_key = os.getenv("OPENROUTER_API_KEY")
-henrik_api_key = os.getenv("HENRIK_API_KEY")
-
-headers = {
-    "Authorization": henrik_api_key
-}
-
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
+from fastapi.staticfiles import StaticFiles
+from fastapi.staticfiles import StaticFiles
+from fastapi import Request
 
 class Player(BaseModel):
     username: str
@@ -23,9 +20,20 @@ class Player(BaseModel):
 
 app = FastAPI()
 
-@app.get("/")
-def root():
-    return{"message": "Server running"}
+#API keys
+openrouter_api_key = os.getenv("OPENROUTER_API_KEY")
+henrik_api_key = os.getenv("HENRIK_API_KEY")
+
+headers = {
+    "Authorization": henrik_api_key
+}
+
+app.mount("/static", StaticFiles(directory="static"), name="static")
+templates = Jinja2Templates(directory="templates")
+
+@app.get("/", response_class=HTMLResponse)
+def home(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
 
 @app.post("/player")
 def get_player(player: Player):
@@ -67,6 +75,8 @@ def get_player(player: Player):
     Be sarcastic but not hateful.
 
     in a single sentence not different for every stat without mentioning the stats
+
+    also add emojis if needed to make it funnier
 
     Stats:
     {summary}
