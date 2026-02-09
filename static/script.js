@@ -34,7 +34,7 @@ async function roastPlayer() {
         if (data.error) {
             resultContent.innerText = "SYSTEM ERROR: " + JSON.stringify(data.error);
             return;
-        }
+       }
 
         typeWriter(data.roast, resultContent);
 
