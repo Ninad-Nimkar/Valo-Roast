@@ -1,22 +1,68 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-    <title>Valo Roast</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VALROAST // Roast Your Stats</title>
+    <!-- Google Fonts: Anton for headers, Kanit for UI text -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Anton&family=Kanit:ital,wght@0,300;0,400;0,600;1,400&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="/static/style.css">
 </head>
+
 <body>
 
-    <div class="container">
-        <h1>Valorant Roast Generator 🔥</h1>
+    <!-- Background Elements -->
+    <div class="bg-grid"></div>
+    <div class="bg-overlay"></div>
 
-        <input type="text" id="username" placeholder="Username">
-        <input type="text" id="tag" placeholder="Tag">
-
-        <button onclick="roastPlayer()">Roast Me</button>
-
-        <div id="result"></div>
+    <!-- Floating Emojis Container -->
+    <div class="emoji-container">
+        <div class="emoji e1">🤡</div>
+        <div class="emoji e2">💀</div>
+        <div class="emoji e3">📉</div>
+        <div class="emoji e4">🗑️</div>
+        <div class="emoji e5">🧂</div>
     </div>
 
-<script src="/static/script.js"></script>
+    <div class="main-container">
+        <!-- Glitch Logo -->
+        <h1 class="valorant-logo" data-text="VALROAST">VALROAST</h1>
+
+        <div class="control-panel">
+            <div class="input-group">
+                <div class="input-wrapper">
+                    <label for="username">RIOT ID</label>
+                    <input type="text" id="username" placeholder="NAME" autocomplete="off">
+                    <div class="corner-accents"></div>
+                </div>
+
+                <div class="input-wrapper">
+                    <label for="tag">TAGLINE</label>
+                    <input type="text" id="tag" placeholder="#TAG" autocomplete="off">
+                    <div class="corner-accents"></div>
+                </div>
+            </div>
+
+            <button onclick="roastPlayer()" class="roast-btn">
+                <span class="btn-content">ROAST ME</span>
+                <span class="btn-glitch"></span>
+            </button>
+        </div>
+
+        <div id="result" class="result-box hidden">
+            <div class="result-header">
+                <span class="rec-dot"></span> SYSTEM MESSAGE
+            </div>
+            <div class="result-content"></div>
+        </div>
+    </div>
+
+    <script src="/static/script.js"></script>
 </body>
+
 </html>

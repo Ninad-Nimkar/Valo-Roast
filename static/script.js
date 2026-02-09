@@ -1,14 +1,21 @@
+// Global variable to store the loading interval
+let loadingInterval = null;
+
 async function roastPlayer() {
     const username = document.getElementById("username").value;
     const tag = document.getElementById("tag").value;
-    const resultDiv = document.getElementById("result");
+    const resultBox = document.getElementById("result");
+    const resultContent = resultBox.querySelector(".result-content");
 
     if (!username || !tag) {
-        resultDiv.innerText = "Enter username and tag.";
+        resultBox.classList.remove("hidden");
+        resultContent.innerText = "ACCESS DENIED: Enter Valid Credentials (Username & Tag).";
         return;
     }
 
-    resultDiv.innerText = "Cooking your roast... 🔥";
+    // Show loading state
+    resultBox.classList.remove("hidden");
+    loadingAnimation(resultContent);
 
     try {
         const response = await fetch("/player", {
@@ -21,15 +28,57 @@ async function roastPlayer() {
 
         const data = await response.json();
 
+        // Clear loading animation
+        clearLoadingAnimation();
+
         if (data.error) {
-            resultDiv.innerText = "Error: " + JSON.stringify(data.error);
+            resultContent.innerText = "SYSTEM ERROR: " + JSON.stringify(data.error);
             return;
         }
 
-        resultDiv.innerText = data.roast;
+        typeWriter(data.roast, resultContent);
 
     } catch (error) {
-        resultDiv.innerText = "Something went wrong.";
+        clearLoadingAnimation();
+        resultContent.innerText = "CRITICAL FAILURE: Connection Lost.";
         console.error(error);
+    }
+}
+
+/* 🔥 Typewriter Effect */
+function typeWriter(text, element, speed = 20) {
+    element.innerText = "";
+    let i = 0;
+
+    function typing() {
+        if (i < text.length) {
+            element.innerText += text.charAt(i);
+            i++;
+            setTimeout(typing, speed);
+        }
+    }
+
+    typing();
+}
+
+/* 🔥 Loading Animation */
+function loadingAnimation(element) {
+    // Clear any existing interval first
+    clearLoadingAnimation();
+
+    let dots = 0;
+    element.innerText = "ANALYZING MATCH HISTORY";
+
+    loadingInterval = setInterval(() => {
+        dots = (dots + 1) % 4;
+        element.innerText = "ANALYZING MATCH HISTORY" + ".".repeat(dots);
+    }, 400);
+}
+
+/* 🔥 Clear Loading Animation */
+function clearLoadingAnimation() {
+    if (loadingInterval) {
+        clearInterval(loadingInterval);
+        loadingInterval = null;
     }
 }
