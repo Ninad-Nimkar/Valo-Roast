@@ -56,22 +56,29 @@ def get_player(player: Player):
 
     rank = player_data["current_data"]["currenttierpatched"]
     Hrank = player_data["highest_rank"]["patched_tier"]
+    season = player_data["highest_rank"]["season"]
     rr = player_data["current_data"]["ranking_in_tier"]
     elo = player_data["current_data"]["elo"]
     last_change = player_data["current_data"]["mmr_change_to_last_game"]
+    n_of_games = player_data["by_season"]["e6a3"]["number_of_games"]
+    wins = player_data["by_season"]["e6a3"]["wins"]
 
     summary = f"""
     Rank: {rank}
-    HRank: {Hrank}
+    Highest Rank: {Hrank}
+    Highest rank season: {season}
     RR: {rr}
     ELO: {elo}
     Last Game RR Change: {last_change}
+    No of games: {n_of_games}
+    wins: {wins}
+
     """
 
     prompt = f"""
     You are a savage but funny esports analyst.
 
-    Roast this Valorant player.
+    Roast this Valorant player based on the stats
     Be sarcastic but not hateful.
 
     in a single sentence not different for every stat without mentioning the stats
