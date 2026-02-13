@@ -45,7 +45,7 @@ async function roastPlayer() {
     }
 }
 
-/* 🔥 Typewriter Effect */
+// Typewriter Effect
 function typeWriter(text, element, speed = 20) {
     element.innerText = "";
     let i = 0;
@@ -61,7 +61,7 @@ function typeWriter(text, element, speed = 20) {
     typing();
 }
 
-/* 🔥 Loading Animation */
+ // Loading Animation
 function loadingAnimation(element) {
     // Clear any existing interval first
     clearLoadingAnimation();
@@ -75,7 +75,7 @@ function loadingAnimation(element) {
     }, 400);
 }
 
-/* 🔥 Clear Loading Animation */
+// Clear Loading Animation 
 function clearLoadingAnimation() {
     if (loadingInterval) {
         clearInterval(loadingInterval);

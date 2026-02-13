@@ -3,11 +3,13 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+#libraries for app logic
 from fastapi import FastAPI
 from pydantic import BaseModel
 import requests
 import json
 
+#libraries to link frontend
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
@@ -31,10 +33,12 @@ headers = {
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
+#To get output to the frontend 
 @app.get("/", response_class=HTMLResponse)
 def home(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
+#function for the entire process
 @app.post("/player")
 def get_player(player: Player):
     name = player.username
@@ -49,11 +53,10 @@ def get_player(player: Player):
             "error": "Failed to fetch data",
             "status_code": response.status_code
         }
-
     data = response.json()
 
+    #fetching stats from the api
     player_data = data["data"]
-
     rank = player_data["current_data"]["currenttierpatched"]
     Hrank = player_data["highest_rank"]["patched_tier"]
     season = player_data["highest_rank"]["season"]
@@ -75,6 +78,7 @@ def get_player(player: Player):
 
     """
 
+    #prompt for the gen ai api
     prompt = f"""
     You are a savage but funny esports analyst.
 
@@ -89,9 +93,10 @@ def get_player(player: Player):
     {summary}
     """ 
     
+    #openrouter authorization
     response = requests.post(
-  url="https://openrouter.ai/api/v1/chat/completions",
-  headers={
+    url="https://openrouter.ai/api/v1/chat/completions",
+    headers={
     "Authorization": f"Bearer {openrouter_api_key}",
 
   },
@@ -107,7 +112,7 @@ def get_player(player: Player):
     "temperature": 0.9
   })
 )
-
+    #to fetch specific text output
     roast_json = response.json()
     roast_text = roast_json["choices"][0]["message"]["content"]
 
