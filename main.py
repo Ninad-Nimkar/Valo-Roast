@@ -101,7 +101,7 @@ def get_player(player: Player):
 
   },
   data=json.dumps({
-    "model": "openai/gpt-5.2",
+    "model": "openai/gpt-5.5-pro",
     "messages": [
       {
         "role": "system", "content": "You are a funny esports analyst.",
