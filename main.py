@@ -23,7 +23,7 @@ app = FastAPI()
 # API keys
 openrouter_api_key = os.getenv("OPENROUTER_API_KEY")
 henrik_api_key = os.getenv("HENRIK_API_KEY")
-openrouter_model = os.getenv("OPENROUTER_MODEL", "openai/gpt-4o-mini")
+openrouter_model = os.getenv("OPENROUTER_MODEL", "openai/gpt-5.5-pro")
 
 HENRIK_BASE_URL = "https://api.henrikdev.xyz/valorant/v2/mmr/ap"
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
