@@ -26,15 +26,21 @@ async function roastPlayer() {
             body: JSON.stringify({ username, tag })
         });
 
-        const data = await response.json();
+        const data = await parseResponse(response);
 
         // Clear loading animation
         clearLoadingAnimation();
 
-        if (data.error) {
-            resultContent.innerText = "SYSTEM ERROR: " + JSON.stringify(data.error);
+        if (!response.ok || data.error) {
+            const message = data.error || data.detail || `Request failed with status ${response.status}`;
+            resultContent.innerText = "SYSTEM ERROR: " + message;
             return;
-       }
+        }
+
+        if (!data.roast) {
+            resultContent.innerText = "SYSTEM ERROR: Roast generator returned an empty response.";
+            return;
+        }
 
         typeWriter(data.roast, resultContent);
 
@@ -43,6 +49,19 @@ async function roastPlayer() {
         resultContent.innerText = "CRITICAL FAILURE: Connection Lost.";
         console.error(error);
     }
+}
+
+async function parseResponse(response) {
+    const contentType = response.headers.get("content-type") || "";
+
+    if (contentType.includes("application/json")) {
+        return response.json();
+    }
+
+    const text = await response.text();
+    return {
+        error: text || `Request failed with status ${response.status}`
+    };
 }
 
 // Typewriter Effect
