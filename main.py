@@ -188,7 +188,7 @@ def get_player(player: Player):
                         "content": prompt,
                     },
                 ],
-                "max_tokens": 300,
+                "max_tokens": 275,
                 "temperature": 0.9,
             },
             timeout=30,
