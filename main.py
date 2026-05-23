@@ -1,12 +1,12 @@
 import os
+from pathlib import Path
 from urllib.parse import quote
 
 import requests
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 from requests import RequestException
 
@@ -27,14 +27,21 @@ openrouter_model = os.getenv("OPENROUTER_MODEL", "openai/gpt-4o-mini")
 
 HENRIK_BASE_URL = "https://api.henrikdev.xyz/valorant/v2/mmr/ap"
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
+BASE_DIR = Path(__file__).resolve().parent
+STATIC_DIR = BASE_DIR / "static"
+INDEX_FILE = STATIC_DIR / "index.html"
 
-app.mount("/static", StaticFiles(directory="static"), name="static")
-templates = Jinja2Templates(directory="templates")
+app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
 
 @app.get("/", response_class=HTMLResponse)
 def home(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+    if not INDEX_FILE.exists():
+        return JSONResponse(
+            status_code=500,
+            content={"error": f"Missing homepage file: {INDEX_FILE}"},
+        )
+    return FileResponse(INDEX_FILE)
 
 
 def api_error(message: str, status_code: int = 500, **extra):
