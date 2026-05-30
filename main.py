@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 from urllib.parse import quote
-
+from openai import APIError, OpenAI
 import requests
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request
@@ -21,12 +21,11 @@ class Player(BaseModel):
 app = FastAPI()
 
 # API keys
-openrouter_api_key = os.getenv("OPENROUTER_API_KEY")
+openai_api_key = os.getenv("OPENAI_API_KEY")
 henrik_api_key = os.getenv("HENRIK_API_KEY")
-openrouter_model = os.getenv("OPENROUTER_MODEL", "openai/gpt-4")
 
 HENRIK_BASE_URL = "https://api.henrikdev.xyz/valorant/v2/mmr/ap"
-OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
+client = OpenAI(api_key=openai_api_key) if openai_api_key else None
 BASE_DIR = Path(__file__).resolve().parent
 STATIC_DIR = BASE_DIR / "static"
 INDEX_FILE = STATIC_DIR / "index.html"
@@ -95,6 +94,11 @@ def upstream_error_message(payload, fallback):
         if payload.get("message"):
             return str(payload["message"])
     return fallback
+
+
+def extract_response_text(response):
+    text = getattr(response, "output_text", "")
+    return text.strip() if isinstance(text, str) else ""
 
 
 @app.post("/player")
@@ -166,46 +170,21 @@ def get_player(player: Player):
     {summary}
     """
 
-    if not openrouter_api_key:
-        return api_error("OPENROUTER_API_KEY is not configured.", status_code=503)
+    if client is None:
+        return api_error("OPENAI_API_KEY is not configured.", status_code=503)
 
     try:
-        response = requests.post(
-            url=OPENROUTER_URL,
-            headers={
-                "Authorization": f"Bearer {openrouter_api_key}",
-                "Content-Type": "application/json",
-            },
-            json={
-                "model": openrouter_model,
-                "messages": [
-                    {
-                        "role": "system",
-                        "content": "You are a funny esports analyst.",
-                    },
-                    {
-                        "role": "user",
-                        "content": prompt,
-                    },
-                ],
-                "max_tokens": 248,
-                "temperature": 0.9,
-            },
-            timeout=30,
+        response = client.responses.create(
+            model="gpt-4o-mini",
+            input=prompt,
         )
-    except RequestException:
-        return api_error("Could not reach OpenRouter.", status_code=502)
+    except APIError as exc:
+        message = str(exc).strip() or "OpenAI failed to generate a roast."
+        return api_error(message, status_code=502)
 
-    roast_json = safe_json(response)
-
-    if response.status_code != 200:
-        message = upstream_error_message(roast_json, "OpenRouter failed to generate a roast.")
-        return api_error(message, status_code=502, upstream_status=response.status_code)
-
-    try:
-        roast_text = roast_json["choices"][0]["message"]["content"]
-    except (KeyError, IndexError, TypeError):
-        return api_error("OpenRouter returned an unexpected completion response.", status_code=502)
+    roast_text = extract_response_text(response)
+    if not roast_text:
+        return api_error("OPENAI returned an unexpected completion response.", status_code=502)
 
     return {
         "stats": summary,

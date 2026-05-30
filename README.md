@@ -17,4 +17,4 @@ UI polish + deployment coming soon.
 ## Tech Stack
 - Python (FastAPI)
 - JavaScript
-- OpenRouter (LLM)
+- OpenAI API
